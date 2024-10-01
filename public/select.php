@@ -1,5 +1,5 @@
 <?php
-include('config.php');
+include('Database.php');
 
 ?>
 <!DOCTYPE html>
@@ -20,4 +20,4 @@ include('config.php');
         <input type="submit" value="Додати">
     </form>
 </body>
-</html>
+</html>git add
