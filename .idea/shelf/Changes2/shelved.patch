@@ -1,0 +1,18 @@
+Index: public/index.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/public/index.php b/public/index.php
+new file mode 100644
+--- /dev/null	(date 1727810451292)
++++ b/public/index.php	(date 1727810451292)
+@@ -0,0 +1,7 @@
++<?php
++if($_SESSION['id']){
++    include ('select.php');
++}else {
++    header('Location: /select.php');
++}
++?>
+\ No newline at end of file
