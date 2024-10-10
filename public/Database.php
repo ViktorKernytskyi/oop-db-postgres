@@ -1,32 +1,46 @@
 <?php
 
+// Включення відображення помилок
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Клас для підключення до бази даних
+echo "hi world" . '<br>';
+require_once 'config.php'; // Підключення конфігурацій
 class Database {
-    private $host = '127.0.0.1';
-    private $db = 'user_data';
-    private $user = 'postgres';
-    private $pass = 'your_password';
-    private $port = '5432';
-    private $charset = 'utf8';
-    private $pdo;
 
-    public function __construct() {
-        $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db};user={$this->user};password={$this->pass}";
-        $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ];
+    private $pdo; // Об'єкт PDO для роботи з базою даних
+    private $table; // Назва таблиці для роботи
+    private $select = '*'; // Поля, які вибираємо
+    private $params = []; // Параметри для запитів
 
+    public function __construct($dsn, $user, $password, $opt)
+    {
+
+        $this->connect($dsn, $user, $password, $opt); // Підключаємось до бази при створенні об'єкта класу
+    }
+
+    /**
+     * Метод підключення до бази даних через PDO
+     */
+    protected function connect($dsn, $user, $password, $opt)
+    {
+        echo "Файл конфігурації підключено успішно!<br>";
+        var_dump($dsn, $user, $password); // Виводимо змінні з конфігурації
         try {
-            $this->pdo = new PDO($dsn, $options);
-        } catch (\PDOException $e) {
-            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+            echo "Спроба підключення...<br>";
+            // Підключення до бази даних через PDO
+            $this->pdo = new PDO($dsn, $user, $password, $opt);
+            echo "З'єднання з базою даних успішне!<br>";
+        } catch (PDOException $e) {
+            // Виводимо помилку, якщо щось пішло не так
+            echo "Помилка підключення: " . $e->getMessage() . "<br>";
         }
+
     }
 
-    public function getPDO() {
-        return $this->pdo;
-    }
+
 }
+
+// Створення об'єкта класу Database
+$db = new Database($dsn, $user, $password, $opt);
