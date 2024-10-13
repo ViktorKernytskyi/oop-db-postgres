@@ -16,6 +16,7 @@ if ($user->deleteUser($id)) {
 } else {
     $message = "Помилка при видаленні користувача."; // Повідомлення про помилку
 }
+
 ?>
 
 <!DOCTYPE html>
