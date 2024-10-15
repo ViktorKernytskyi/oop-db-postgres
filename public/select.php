@@ -1,4 +1,25 @@
 <?php
+/** Session initialization */
+session_start(); // Ініціалізація сесії
+require_once 'config.php'; // Connecting configurations - Підключення конфігурацій
+require_once 'Database.php'; // Connecting the database class - Підключення класу бази даних
+require_once 'User.php'; // Connecting the user class - Підключення класу користувача
+
+// Database connection - Підключення до бази даних
+$database = new Database($dsn, $user, $password, $opt); // We create a database object - Створюємо об'єкт бази даних
+$pdo = $database->getPDO(); // We get the PDO object - Отримуємо об'єкт PDO
+
+// Creating a user object - Створення об'єкту користувача
+$user = new User($pdo);
+$users = [];
+// We get all users - Отримуємо всіх користувачів
+$users = $user->getAllUsers();
+
+// Checking if the form was submitted via POST - Перевірка, чи була надіслана форма методом POST
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['name'])) {
+    $name = trim($_POST['name']); //Getting the value of the field 'name' and removing extra spaces - Отримання значення поля 'name' і видалення зайвих пробілів
+    $users = $user->getUsersByName($name); // Method call to get users by name - Виклик методу для отримання користувачів за ім'ям
+}
 
 
 ?>
@@ -8,61 +29,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вибір користувача</title>
+    <title>User choice</title>
 </head>
 <body>
-<h1>Вибір користувача за іменем</h1>
+<h1>Selecting a user by name</h1>
 
 <form action="select.php" method="POST">
-    <label for="name">Ім'я:</label>
+    <label for="name">Name:</label>
     <input type="text" name="name" required><br><br>
-    <input type="submit" value="Знайти">
+    <input type="submit" value="Find">
 </form>
-
-<!-- Виведення результатів -->
-<?php
-    if (isset($users)) {
-        echo "<h2>Результати:</h2>";
-foreach ($users as $user) {
-echo "<p>{$user['first_name']} {$user['last_name']}</p>";
-}
-}
-?>
+<?php if (!empty($users)): ?>
+    <h2>Search results:</h2>
+    <ul>
+        <?php foreach ($users as $user): ?>
+            <li>ID: <?= htmlspecialchars($user['id']) ?>, Ім'я: <?= htmlspecialchars($user['first_name']) ?>, Прізвище: <?= htmlspecialchars($user['last_name']) ?>, Email: <?= htmlspecialchars($user['email']) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php elseif ($_SERVER["REQUEST_METHOD"] == "POST"): ?>
+    <p>No users with this name were found.</p>
+<?php endif; ?>
 </body>
 </html>
-
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список Користувачів</title>
-</head>
-<body>
-<h1>Список Користувачів</h1>
-<a href="add.php">Додати Користувача</a> <!-- Посилання на сторінку додавання -->
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Ім'я</th>
-        <th>Прізвище</th>
-        <th>Email</th>
-        <th>Телефон</th>
-        <th>Дії</th>
-    </tr>
-<!--    --><?php //foreach ($users as $user): ?>
-        <tr>
-<!--            <td>--><?php //echo $user['id']; ?><!--</td>-->
-<!--            <td>--><?php //echo $user['first_name']; ?><!--</td>-->
-<!--            <td>--><?php //echo $user['last_name']; ?><!--</td>-->
-<!--            <td>--><?php //echo $user['email']; ?><!--</td>-->
-<!--            <td>--><?php //echo $user['phone']; ?><!--</td>-->
-            <td>
-<!--                <a href="edit.php?id=--><?php //echo $user['id']; ?><!--">Редагувати</a> |-->
-<!--                <a href="delete.php?id=--><?php //echo $user['id']; ?><!--">Видалити</a>-->
-            </td>
-        </tr>
-<!--    --><?php //endforeach; ?>
-</table>
-</body>
-</html>
+<a href="select.php">Return to search</a><br/><br/>
