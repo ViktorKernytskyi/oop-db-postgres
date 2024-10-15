@@ -33,7 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['name'])) {
 </head>
 <body>
 <h1>Selecting a user by name</h1>
-
 <form action="select.php" method="POST">
     <label for="name">Name:</label>
     <input type="text" name="name" required><br><br>
@@ -43,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['name'])) {
     <h2>Search results:</h2>
     <ul>
         <?php foreach ($users as $user): ?>
-            <li>ID: <?= htmlspecialchars($user['id']) ?>, Ім'я: <?= htmlspecialchars($user['first_name']) ?>, Прізвище: <?= htmlspecialchars($user['last_name']) ?>, Email: <?= htmlspecialchars($user['email']) ?></li>
+            <li>ID: <?= htmlspecialchars($user['id']) ?>, First_name: <?= htmlspecialchars($user['first_name']) ?>, Last_name: <?= htmlspecialchars($user['last_name']) ?>, Email: <?= htmlspecialchars($user['email']) ?></li>
         <?php endforeach; ?>
     </ul>
 <?php elseif ($_SERVER["REQUEST_METHOD"] == "POST"): ?>
