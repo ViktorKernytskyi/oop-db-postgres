@@ -97,5 +97,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </form>
 
 <p><?php echo htmlspecialchars($message); ?></p> <!-- We display messages protecting against XSS - Виводимо повідомлення, захищаючись від XSS -->
+
 </body>
 </html>
