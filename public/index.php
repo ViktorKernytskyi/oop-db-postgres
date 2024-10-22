@@ -1,12 +1,12 @@
 <?php
-session_start(); // Ініціалізація сесії
-
-// Перевірка, чи є активна сесія
+session_start(); // Session initialization
+/**
+ *Checking if the session is active
+ */
 if (isset($_SESSION['id'])) {
-    include('select.php'); // Включаємо select.php, якщо сесія активна
+    include('select.php'); // Include select.php if the session is active
 } else {
-    header('Location: select.php'); // Перенаправлення на select.php, якщо сесія неактивна
-    exit(); // Завершуємо скрипт, щоб не виконувати далі
+    header('Location: select.php'); // Redirect to select.php if session is inactive
+    exit(); //We end the script so that it does not continue
 }
 
-?>

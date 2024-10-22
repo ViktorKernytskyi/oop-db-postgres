@@ -1,47 +1,50 @@
 <?php
 
-// Включення відображення помилок
+//Enable display of errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 //echo "hi world" . '<br>';
-require_once 'config.php'; // Підключення конфігурацій
+require_once 'config.php'; // Connecting configurations
 class Database {
 
-    private $pdo; // Об'єкт PDO для роботи з базою даних
-    private $table; // Назва таблиці для роботи
-    private $select = '*'; // Поля, які вибираємо
-    private $params = []; // Параметри для запитів
+    private $pdo; // A PDO object for working with the database
+    private $table; // The name of the table to work with
+    private $select = '*'; // Fields that we choose
+    private $params = []; // Parameters for queries
 
     public function __construct($dsn, $user, $password, $opt)
     {
 
-        $this->connect($dsn, $user, $password, $opt); // Підключаємось до бази при створенні об'єкта класу
+        $this->connect($dsn, $user, $password, $opt); // We connect to the database when creating a class object
     }
 
     /**
-     * Метод підключення до бази даних через PDO
+     * A method of connecting to a database via PDO
      */
     protected function connect($dsn, $user, $password, $opt)
     {
-        echo "Файл конфігурації підключено успішно!<br>";
-       // var_dump($dsn, $user, $password); // Виводимо змінні з конфігурації
+        echo "Configuration file connected successfully!<br>";
         try {
-            echo "Спроба підключення...<br>";
-            // Підключення до бази даних через PDO
+            echo "Trying to connect...<br>";
+            // Connecting to a database via PDO
             $this->pdo = new PDO($dsn, $user, $password, $opt);
-            echo "З'єднання з базою даних успішне!<br>";
+            echo "The connection to the database is successful!<br>";
         } catch (PDOException $e) {
-            // Виводимо помилку, якщо щось пішло не так
-            echo "Помилка підключення: " . $e->getMessage() . "<br>";
+            // We output an error if something went wrong
+            echo "Connection error: " . $e->getMessage() . "<br>";
         }
 
     }
-
-
     /**
-     * Вказуємо таблицю для операцій
+     *getPDO() method to get a PDO object
+     */
+    public function getPDO() {
+        return $this->pdo;
+    }
+    /**
+     * Specify the table for operations
      */
     public function table($name)
     {
@@ -50,7 +53,7 @@ class Database {
     }
 
     /**
-     * Вибираємо поля для запиту
+     * We select the fields for the request
      */
     public function select(...$names)
     {
@@ -59,7 +62,7 @@ class Database {
     }
 
     /**
-     * Додаємо умови WHERE до запиту
+     * Add WHERE conditions to the query
      */
     public function where($column, $value)
     {
@@ -68,14 +71,14 @@ class Database {
     }
 
     /**
-     * Виконуємо SELECT-запит і повертаємо результат
+     * We execute a SELECT query and return the result
      */
     public function get()
     {
         $response = [];
         $whereClause = '';
 
-// Формуємо WHERE частину запиту
+// Form the WHERE part of the request
         if (!empty($this->params)) {
             $conditions = [];
             foreach ($this->params as $column => $value) {
@@ -84,24 +87,28 @@ class Database {
             $whereClause = ' WHERE ' . implode(' AND ', $conditions);
         }
 
-// Підготовлений SQL-запит
+// Prepared SQL query
         $sql = "SELECT {$this->select} FROM {$this->table}" . $whereClause;
         $stmt = $this->pdo->prepare($sql);
 
-// Виконуємо запит з параметрами
+// We execute a request with parameters
         foreach ($this->params as $column => $value) {
             $stmt->bindValue(":$column", $value);
         }
 
         $stmt->execute();
-        return $stmt->fetchAll(); // Повертаємо всі результати
+        return $stmt->fetchAll(); // We return all results
     }
 
     /**
-     * Метод для вставки нових даних (INSERT)
+     * Method for inserting new data (INSERT)
      */
     public function insert($data)
     {
+        // Remove the 'id' key from the array, if it exists
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
         $columns = implode(',', array_keys($data));
         $values = ':' . implode(', :', array_keys($data));
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
@@ -111,11 +118,11 @@ class Database {
             $stmt->bindValue(":$key", $value);
         }
 
-        return $stmt->execute(); // Виконуємо запит і повертаємо результат
+        return $stmt->execute(); // We execute the request and return the result
     }
 
     /**
-     * Метод для оновлення даних (UPDATE)
+     *Method for updating data (UPDATE)
      */
     public function update($data)
     {
@@ -147,11 +154,11 @@ class Database {
             $stmt->bindValue(":where_$column", $value);
         }
 
-        return $stmt->execute(); // Виконуємо запит
+        return $stmt->execute(); // We execute the request
     }
 
     /**
-     * Метод для видалення даних (DELETE)
+     * Method for deleting data (DELETE)
      */
     public function delete()
     {
@@ -171,12 +178,15 @@ class Database {
             $stmt->bindValue(":$column", $value);
         }
 
-        return $stmt->execute(); // Виконуємо запит
+        return $stmt->execute(); // We execute the request
     }
 
 
 
 }
 
-// Створення об'єкта класу Database
+/**
+ * @var  $db
+ * Creating an object of the Database class
+ */
 $db = new Database($dsn, $user, $password, $opt);
