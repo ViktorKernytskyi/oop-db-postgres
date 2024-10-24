@@ -1,6 +1,6 @@
 <?php
 include('config.php');
-
+require_once 'Database.php'; // Connecting the database class - Підключення класу бази даних
 // Database connection - Підключення до бази даних
 $database = new Database($dsn, $user, $password, $opt); // We create a database object - Створюємо об'єкт бази даних
 $pdo = $database->getPDO(); // We get the PDO object - Отримуємо об'єкт PDO
