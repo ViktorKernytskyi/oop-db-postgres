@@ -29,12 +29,13 @@ $users = $user->getAllUsers();//  Отримуємо всіх користува
 <h1>Edit User</h1>
 <table border="1" align="center" cellspacing="0">
     <tr>
-        <th>id</th>
-        <th>name</th>
-        <th>email</th>
-        <th>phone</th>
-        <th>дійство</th>
-        <th>дійство</th>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
     </tr>
     <?php
     if (!empty($users)) {
