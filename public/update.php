@@ -1,15 +1,18 @@
 <?php
-include('config.php');
+require_once 'config.php';
 require_once 'Database.php'; // Connecting the database class - Підключення класу бази даних
 // Database connection - Підключення до бази даних
 $database = new Database($dsn, $user, $password, $opt); // We create a database object - Створюємо об'єкт бази даних
 $pdo = $database->getPDO(); // We get the PDO object - Отримуємо об'єкт PDO
 
 $message = '';
+
 /** Checking if the ID was passed */
 // Перевірка, чи був переданий ID
-if (isset($_GET['id'])) {
-    $userId = $_GET['id'];
+$userId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$userId) {
+    die("The user ID was not passed or is incorrect.");// ID користувача не передано або невірне
+}
 
 //    $user = new User($pdo);// Створення об'єкта користувача
 //    /** @var  $users
@@ -40,7 +43,8 @@ if (isset($_GET['id'])) {
 
         if (!empty($firstName) && !empty($lastName) && !empty($email) && !empty($phone) && !empty($password)) {
             try {
-                $stmt = $pdo->prepare("UPDATE users SET first_name = :name, last_name = :name,email = :email, phone = :phone, password = :password WHERE id = :id");
+                //  Request to update the user - Запит на оновлення користувача
+                $stmt = $pdo->prepare("UPDATE users SET first_name = :firstname, last_name = :lasttname,email = :email, phone = :phone, password = :password WHERE id = :id");
                 $stmt->execute([
                     'firstname' => $firstName,
                     'lastname' => $lastName,
@@ -50,6 +54,17 @@ if (isset($_GET['id'])) {
                     'id' => $userId
                 ]);
 
+                // If the password is not empty, add it to the request - Якщо пароль не пустий, додаємо його до запиту
+                if (!empty($password)) {
+                    $stmt .= ", password = :password";
+                    $params['password'] = password_hash($password, PASSWORD_DEFAULT);
+                }
+
+                // We are completing the request - Завершуємо запит
+                $stmt .= " WHERE id = :id";
+                $stmt = $pdo->prepare( $stmt);
+                $stmt->execute($stmt);
+
                 $message = "User data updated successfully.";//Дані користувача успішно оновлено
             } catch (PDOException $e) {
                 $message = "Error updating data: " . $e->getMessage();//Помилка при оновленні даних
@@ -57,7 +72,7 @@ if (isset($_GET['id'])) {
         } else {
             $message = "All fields are mandatory.";//Всі поля є обов'язковими для заповнення
         }
-    }
+
 } else {
     die("User ID not passed.");//ID користувача не передано
 }
@@ -96,11 +111,11 @@ if (isset($_GET['id'])) {
 <?php endif; ?>
 <form method="POST">
     <div>
-        <label for="users_firstName">Ім'я:</label>
+        <label for="users_firstName">firstName:</label>
         <input type="text" id="users_firstName" name="users_firstName" value="<?php echo htmlspecialchars($currentUser['first_name']); ?>" required>
     </div>
     <div>
-        <label for="users_lastName">Ім'я:</label>
+        <label for="users_lastName">lastName:</label>
         <input type="text" id="users_lastName" name="users_lastName" value="<?php echo htmlspecialchars($currentUser['last_name']); ?>" required>
     </div>
     <div>
@@ -108,11 +123,11 @@ if (isset($_GET['id'])) {
         <input type="email" id="email" name="users_email" value="<?php echo htmlspecialchars($currentUser['email']); ?>" required>
     </div>
     <div>
-        <label for="phone">Телефон:</label>
+        <label for="phone">phone:</label>
         <input type="text" id="phone" name="users_phone" value="<?php echo htmlspecialchars($currentUser['phone']); ?>" required>
     </div>
 <!--    <div>-->
-<!--        <label for="password">Пароль:</label>-->
+<!--        <label for="password">Новий пароль (необов'язково):</label>-->
 <!--        <input type="password" id="password" name="users_password" required>-->
 <!--    </div>-->
     <input type="submit" value="Update record">//Оновити запис
