@@ -56,7 +56,7 @@ $users = $user->getAllUsers();//  Отримуємо всіх користува
             </tr>';
         }
     } else {
-        echo "<tr><td colspan='6'>No data available</td></tr>";
+        echo "<tr><td colspan='7'>No data available</td></tr>";
     }
     ?>
 </table>
