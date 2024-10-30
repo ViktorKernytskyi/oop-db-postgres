@@ -27,7 +27,12 @@ if (!$userId) {
 /** Update form processing */
 // First, we check whether the POST request for the update has arrived
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-     $firstName = trim($_POST['users_firstName']);
+    /** @var  $userId Check if the user ID was passed via POST */
+    $userId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT); // Перевірка, чи передано ID користувача через POST-запит
+    if (!$userId) {
+        die("User ID not passed in form.");
+    }
+    $firstName = trim($_POST['users_firstName']);
     $lastName = trim($_POST['users_lastName']);
     $email = trim($_POST['users_email']);
     $phone = trim($_POST['users_phone']);
@@ -45,8 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                // 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'id' => $userId
             ]);
-
-            $message = "User data updated successfully.";
+            // Redirect to avoid form resubmission - Перенаправлення для уникнення повторного відправлення форми
+            header("Location: edit.php?id=" . $userId);
+            exit;
         } catch (PDOException $e) {
             $message = "Error updating data: " . $e->getMessage();
         }
@@ -54,13 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "All fields are mandatory.";
     }
 } else {
-    /** @var  $userId
-     *If it is not a POST request, then we load data for the form
-     */
-       $userId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Якщо не POST-запит, тоді завантажуємо дані для форми
+    /** If it is not a POST request, then we load data for the form */
+    $userId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT); // Якщо не POST-запит, тоді завантажуємо дані для форми
     if (!$userId) {
         die("The user ID was not passed or is incorrect.");
     }
+
     /** Obtaining user data for pre-filling the form */
     // Отримання даних користувача для попереднього заповнення форми
     try {
